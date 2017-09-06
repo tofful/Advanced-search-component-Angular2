@@ -1,0 +1,68 @@
+﻿<div class="advancedSearchBox" (click)="thisSearchBoxComponent($event)">
+    <!--Parameters/Applied Filters-->
+
+    <div class="parameter" *ngFor="let param of searchParams; let i = index">
+        <i (click)="removeSearchParameter($event, i)" class="themeLink icon-close" title="Remove filter"></i>
+        <div class="property">{{param.Label || param.Property}}</div>
+        <div class="value" id="{{param.Property}}"> 
+
+            <!--Filter input-->
+            <input [style.width]="((param.Value?.length + 10) * 3.8 ) + 'px'"
+                   [(ngModel)]="param.Value" 
+                   [title]="param.Value? param.Value : '' " 
+                   (keyup)="onEnterInValue($event)" 
+                   (blur)="removeEmptyValues(); inputBlurActions()" 
+                   (focus)="inputFocusActions($event)"
+                   [ngClass]="{uppercase: param.Uppercase}"
+                   type="{{param.Type == 'date' ? text : (param.Type || 'text')}}" 
+                   placeholder="{{param.Type == 'date' ? 'dd/mm/YYYY' : (param.Type || 'text')}}" 
+                   [attr.min]="param.Type == 'number'? 0 : '' "  />
+            
+            <!--Suggested values/options-->
+            <div *ngIf="param.SuggestedValues" class="suggestedValues">
+                <ul>
+                    <template ngFor let-suggested [ngForOf]="param.SuggestedValues">
+                        <li (click)="addSuggestedValue($event, i)">{{suggested}}</li>
+                    </template>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!--Main input and dropdown options-->
+    <div class="filtersWrap">
+        <input (focus)="focusSearchBox()" 
+               (blur)="blurSearchBox()" 
+               (keyup)="onKey($event); highlightSearch($event)" 
+               [(ngModel)]="inputSearchValue" 
+               class="inputSearch"
+               type="text" 
+               placeholder="{{placeholder}}">
+
+        <!--Dropdown options-->
+        <div *ngIf="showFilters && !ALLFilterSelected" class="searchFilters">
+            <ul>
+                <template ngFor let-filter [ngForOf]="filterOptions" let-i="index">
+                    <li *ngIf="!filter.isSelected"
+                        (click)="selectFilter($event, i)">
+                        {{filter.Label || filter.Property}}
+                    </li>
+                 </template>
+                 <li style="display:none">There are not more filters.</li>
+            </ul>
+        </div>
+        <div *ngIf="showFilters && ALLFilterSelected" class="searchFilters">
+            <ul>
+                <li>Search in <strong>ALL</strong> filters</li>
+            </ul>
+        </div>
+      </div>
+
+    <!--Icons right hand side of search-->
+    <div class="iconSearchActions">
+        <i *ngIf="searchParams.length == 0" class="icon-search"></i>
+        <i *ngIf="searchParams.length > 0" (click)="cleanSearch()" class="clear icon-close" title="Clear search"></i>
+    </div>
+</div>
+
